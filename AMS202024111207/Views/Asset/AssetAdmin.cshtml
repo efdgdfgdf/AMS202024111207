@@ -1,0 +1,96 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model IEnumerable<AMS202024111207.Models.Asset>
+@using AMS202024111207.Models
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@inject AmsDbContext _context
+@{
+	ViewData["Title"] = "资产管理";
+}
+
+<style>
+	.table td, .table th {
+		text-align: center;
+		vertical-align: middle;
+	}
+</style>
+<!--margin-top:3-->
+<div class="container mt-5 mb-5">
+	<h3>资产管理</h3>
+	@{
+		if (TempData["Result"] != null)
+		{
+			<span style="color:red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
+		}
+	}
+	<hr />
+	<div class="row">
+		<form method="post" action="AssetAdmin">
+			输入关键词（如电脑、座椅）：<input type="text" name="keyword" value="@ViewBag.keyword" required>
+			<input type="submit" value="查询资产" class="btn btn-primary btn-sm">
+			<a href="/Admin/AssetAdmin" role="button" class="btn btn-primary btn-sm">全部</a>
+			<a href="/Admin/AssetAdd" role="button" class="btn btn-primary btn-sm">添加资产</a>
+		</form>
+	</div>
+	@{
+		if (Model != null)
+		{
+			<table class="table table-hover">
+				<thead class="table-light">
+					<tr>
+						<td>资产编号</td>
+						<td>资产名称</td>
+						<td>资产规格</td>
+						<td>价格</td>
+						<td>购入日期</td>
+						<td>存放位置</td>
+						<td>资产类别</td>
+						<td>资产图片</td>
+						<td>资产保管人</td>
+						<td>操作</td>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>
+								@item.AssetId
+							</td>
+							<td>
+								@item.AssetName
+							</td>
+							<td>
+								@item.Specification
+							</td>
+							<td>
+								@item.Price
+							</td>
+							<td>
+								@item.PurchaseDate
+							</td>
+							<td>
+								@item.Location
+							</td>
+							<td>
+								@item.Category.CategoryName
+							</td>
+							<td>
+								<img src="~/images/@item.ImgName" style="max-width: 70%; height: auto;" />
+							</td>
+							<td>
+								@item.Custodian.EmployeeId
+							</td>
+							<td>
+								<a href="/Admin/AssetEdit?id=@item.AssetId" class="btn btn-sm btn-outline-primary">修改</a>
+								<a href="/Admin/AssetDelete?id=@item.AssetId" class="btn btn-sm btn-outline-danger"
+					   	onclick="return confirm('确定要删出相片  @item.AssetId - @item.AssetName 吗？');">删除</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	}
+</div>

@@ -1,0 +1,94 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using AMS202024111207.Models
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@model AMS202024111207.Models.Asset
+@inject AmsDbContext _context
+
+@{
+	ViewData["Title"] = "修改资产信息";
+	var employees = _context.Employees.ToList();
+	var categories = _context.Categories.ToList();
+}
+
+<div class="container mt-5 mb-5">
+	<h3>修改相片</h3>
+	@{
+		if (TempData["Result"] != null)
+		{
+			<span style="color:red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
+		}
+	}
+	<hr />
+	<div class="row">
+		<div class="col-md-4">
+			<form method="post" asp-action="AssetEdit" enctype="multipart/form-data">
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+				<input type="hidden" asp-for="AssetId" />
+
+				<div class="form-group">
+					<label asp-for="AssetName" class="control-label"></label>
+					<input asp-for="AssetName" class="form-control" />
+					<span asp-validation-for="AssetName" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<label asp-for="Specification" class="control-label"></label>
+					<input asp-for="Specification" class="form-control" />
+					<span asp-validation-for="Specification" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<label asp-for="Price" class="control-label"></label>
+					<input asp-for="Price" class="form-control" />
+					<span asp-validation-for="Price" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<label asp-for="PurchaseDate" class="control-label"></label>
+					<input asp-for="PurchaseDate" class="form-control" />
+					<span asp-validation-for="PurchaseDate" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<label asp-for="Location" class="control-label"></label>
+					<input asp-for="Location" class="form-control" />
+					<span asp-validation-for="Price" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--类别-->
+					相片分类
+					<select asp-for="CategoryId" class="form-select">
+						@foreach (var item in categories)
+						{
+							<option value="@item.CategoryId">@item.CategoryName</option>
+						}
+					</select>
+				</div><br />
+				
+				<div class="form-group">
+					<!--资产保管人-->
+					资产保管人
+					<select asp-for="CustodianId" class="form-select">
+						@foreach (var item in employees)
+						{
+							<option value="@item.EmployeeId">@item.EmployeeId</option>
+						}
+					</select>
+				</div><br />
+
+				<label asp-for="ImgName" class="control-label"></label>
+				<img src="~/images/@Model.ImgName" alt="" style="width:415px;" />
+				<a style="color:cornflowerblue; text-align:center;">@Model.ImgName</a><br /><br />
+
+				<div class="form-group">
+					<input type="file" name="imgFile" />
+					<input type="submit" value="提交修改" class="btn btn-primary" />
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

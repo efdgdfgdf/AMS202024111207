@@ -1,0 +1,94 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using AMS202024111207.Models 
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers 
+@model AMS202024111207.Models.Asset
+@inject AmsDbContext _context 
+@{ 
+    ViewData["Title"] = "添加资产"; 
+    var cagegories = _context.Categories.ToList(); 
+} 
+
+
+<div class="container mt-5 mb-5">
+    <h3>添加资产</h3>
+    @{
+        if (TempData["Result"] != null)
+        {
+            <span style="color: red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
+        }
+    }
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post" action="@Url.Action("AssetAdd")" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger" />
+
+                <!--资产信息-->
+                <div class="form-group">
+                    <!--资产名称-->
+                    <label asp-for="AssetName" class="control-label"></label>
+                    <input asp-for="AssetName" class="form-control" />
+                    <span asp-validation-for="AssetName" class="text-danger"></span>
+                </div><br />
+
+                <div class="form-group">
+                    <!--资产规格-->
+                    <label asp-for="Specification" class="control-label"></label>
+                    <input asp-for="Specification" class="form-control" />
+                    <span asp-validation-for="Specification" class="text-danger"></span>
+                </div><br />
+
+                <div class="form-group">
+                    <!--价格-->
+                    <label asp-for="Price" class="control-label"></label>
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div><br />
+
+                <div class="form-group">
+                    <!--存放位置-->
+                    <label asp-for="Location" class="control-label"></label>
+                    <input asp-for="Location" class="form-control" />
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div><br />
+
+                <div class="form-group">
+                    <!--类别-->
+                    相片分类 
+                    <select asp-for="CategoryId" class="form-select">
+                    @foreach (var item in cagegories) 
+                    { 
+                        <option value="@item.CategoryId">@item.CategoryName</option>
+                    } 
+                    </select>
+                </div><br />
+
+                <div class="form-group">
+                    <!--资产保管人-->
+                    <label asp-for="CustodianId" class="control-label"></label>
+                    <input asp-for="CustodianId" class="form-control" />
+                    <span asp-validation-for="CustodianId" class="text-danger"></span>
+                </div><br />
+
+                <!--相片档-->
+                <div class="form-group">
+                    <input type="file" name="imgFile" accept=".png,.jpg,.gif" id="uploadFile" onchange="checkFileType()" required />
+                    <input type="submit" value="相片提交" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function checkFileType() {
+        const allowedTypes = ["image/png", "image/jpeg", "image/gif"];
+        const fileInput = document.getElementById("uploadFile");
+        const chosenFile = fileInput.files[0];
+        if (chosenFile && !allowedTypes.includes(chosenFile.type)) {
+            alert("请上传.png, .jpg, .gif 格式的文件！");
+            fileInput.value = "";
+        }
+    }
+</script>

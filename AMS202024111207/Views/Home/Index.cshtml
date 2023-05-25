@@ -1,0 +1,68 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@model IEnumerable<AMS202024111207.Models.Asset>
+@{
+    ViewData["Title"] = "固定资产管理";
+}
+
+<div class="container mt-3 mb-3">
+    <div class="text-center">
+        <h1 class="display-4">固定资产管理系统</h1>
+        @{
+            if (TempData["Result"] != null)
+            {
+                <div class="text-center">
+                    <span style="color:red">操作结果==> @TempData["Result"]</span>
+                </div>
+            }
+        }
+        <hr />
+        <!--遍历相片分类名，显示分类名称-->
+        @foreach (var catName in ViewBag.catNames)
+        {
+            <a href="/Home/Index?cat=@catName" style="text-decoration: none; ">@catName</a>
+            // 执行迭代操作
+        }
+        <a href="/Home/Index" style="text-decoration: none; ">最新</a>
+        <hr />
+    </div>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-12 col-md-3 col-sm-6 mt-3">
+                <div class="img-fluid img-thumbnail">
+                    <!--圆角边框-->
+                    <img src="~/images/@item.ImgName" style="width: 100%;" /><hr />
+                    <b>编号：@item.AssetId</b>
+                    <br /><b style="color:#0396ff">@item.AssetName</b> - @item.Category.CategoryName
+                    <br /><a style="color:slateblue">资产保管人：@item.CustodianId</a>
+                    <br /><a style="color:slateblue">资产规格：@item.Specification</a> - @item.Price
+                    <br /><a style="color:slateblue">发布时间：@item.PurchaseDate</a>
+                    <br />@item.Location
+                    <p class="text-center"><br /><a href="#" class="btn btn-sm btn-outline-primary">了解更多</a></p>
+                </div>
+            </div>
+        }
+    </div>
+    <br />
+    <!--分页-->
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
