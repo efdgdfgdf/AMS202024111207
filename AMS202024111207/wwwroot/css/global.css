@@ -1,0 +1,23 @@
+﻿/* 表格信息居中 */
+.table td, .table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* 查询搜素框美化 */
+input[type="text"][name="keyword"] {
+    border: 2px solid #ccc; /* 设置边框为灰色 */
+    border-radius: 10px; /* 设置圆角为20像素 */
+    padding: 7px; /* 设置内边距为7像素 */
+    font-size: 16px; /* 设置字体大小为16像素 */
+    width: 300px; /* 设置宽度为300像素 */
+    outline: none; /* 去除默认的外边框 */
+}
+
+input[type="text"][name="keyword"]:focus {
+    border-color: #007bff; /* 获得焦点时边框颜色变为深蓝 */
+}
+
+a {
+    text-decoration: none;
+}

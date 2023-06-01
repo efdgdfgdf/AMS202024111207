@@ -12,9 +12,7 @@ namespace AMS202024111207.Controllers
     {
         private readonly AmsDbContext _context;
         private IList<Asset> assets;
-        private IList<Category> categories;
-        private IList<Department> departments;
-        private IList<Employee> employees;
+       
         private string _path; //图片路径变项
         public AssetController(AmsDbContext context, IHostEnvironment environment)
         {
@@ -63,6 +61,11 @@ namespace AMS202024111207.Controllers
             return View(asset);
         }
 
+        public IActionResult AssetDetails(int id)
+        {
+            var asset = _context.Assets.FirstOrDefault(a => a.AssetId == id);
+            return View(asset);
+        }
         //修改资产信息
         public IActionResult AssetEdit(int id)
         {
@@ -80,6 +83,8 @@ namespace AMS202024111207.Controllers
                 {
                     if (imgFile.Length > 0)
                     {
+                        //删除资产旧的相片
+                        System.IO.File.Delete($"{_path}\\{asset.ImgName}");
                         //相片提交
                         string fileName = $"{Guid.NewGuid().ToString()}.{Path.GetExtension(imgFile.FileName).Substring(1)}";
                         string savePath = $"{_path}\\{fileName}";
@@ -89,23 +94,53 @@ namespace AMS202024111207.Controllers
                         }
                         int assetId = asset.AssetId;
                         var temp = _context.Assets.FirstOrDefault(a => a.AssetId == assetId);
-                        temp.AssetName = asset.AssetName;
-                        temp.Specification = asset.Specification;
-                        temp.Price = asset.Price;
-                        temp.PurchaseDate = asset.PurchaseDate;
-                        temp.Location = asset.Location;
-                        temp.CategoryId = asset.CategoryId;
-                        temp.ImgName = fileName;
-                        temp.CustodianId = asset.CustodianId;
-                        _context.SaveChanges();
-                        TempData["Result"] = "固定资产信息修改成功!";
+                        if (temp != null)
+                        {
+                            temp.AssetName = asset.AssetName;
+                            temp.Specification = asset.Specification;
+                            temp.Price = asset.Price;
+                            temp.PurchaseDate = asset.PurchaseDate;
+                            temp.Location = asset.Location;
+                            temp.CategoryId = asset.CategoryId;
+                            temp.ImgName = fileName;
+                            temp.CustodianId = asset.CustodianId;
+                            _context.SaveChanges();
+                            TempData["Result"] = "固定资产信息修改成功!";
+                        }
+                        else
+                        {
+                            TempData["Result"] = "此固定资产信息不存在!";
+                        }
                         return RedirectToAction("AssetAdmin");//重定向到资产管理页
                     }
+                }
+                else
+                {
+                    TempData["Result"] = "固定资产信息修改失败!";
                 }
             }
             else
             {
-                TempData["Result"] = "固定资产信息修改失败!";
+                int assetId = asset.AssetId;
+                var temp = _context.Assets.FirstOrDefault(a => a.AssetId == assetId);
+                if (temp != null)
+                {
+                    temp.AssetName = asset.AssetName;
+                    temp.Specification = asset.Specification;
+                    temp.Price = asset.Price;
+                    temp.PurchaseDate = asset.PurchaseDate;
+                    temp.Location = asset.Location;
+                    temp.CategoryId = asset.CategoryId;
+                    temp.ImgName = asset.ImgName;
+                    temp.CustodianId = asset.CustodianId;
+                    _context.SaveChanges();
+                    TempData["Result"] = "固定资产信息修改成功!";
+                }
+                else
+                {
+                    TempData["Result"] = "此固定资产信息不存在!";
+                }
+                return RedirectToAction("AssetAdmin");//重定向到资产管理页
             }
             return View(asset);
         }
@@ -117,16 +152,21 @@ namespace AMS202024111207.Controllers
             {
                 //使用LINQ扩充方法，可多个字段查询
                 assets = _context.Assets.OrderBy(a => a.AssetId)
-                    .Where(a => a.AssetName.Contains(keyword) || a.Specification.Contains(keyword) || a.Location.Contains(keyword) || a.CustodianId.Contains(keyword))
+                    .Where(a => a.AssetId.ToString().Contains(keyword) || a.AssetName.Contains(keyword) || a.Specification.Contains(keyword) || a.PurchaseDate.ToString().Contains(keyword) || a.Location.Contains(keyword) || a.Category.CategoryName.Contains(keyword) || a.Custodian.UserName.Contains(keyword) || a.Custodian.Department.DepartmentName.Contains(keyword))
                     .Include(a => a.Category).AsNoTracking()
+                    .Include(a => a.Custodian).AsNoTracking()
+                    .Include(a => a.Custodian.Department).AsNoTracking()
                     .ToList();
                 ViewBag.keyword = keyword;
+                ViewBag.assets = assets;
                 return View(assets);
             }
             assets = _context.Assets.OrderBy(a => a.AssetId)
             .Include(a => a.Category).AsNoTracking()
             .Include(a => a.Custodian).AsNoTracking()
+            .Include(a => a.Custodian.Department).AsNoTracking()
             .ToList();
+            ViewBag.assets = assets;
             return View(assets);
         }
 
@@ -134,11 +174,18 @@ namespace AMS202024111207.Controllers
         public IActionResult AssetDelete(int id)
         {
             var asset = _context.Assets.FirstOrDefault(a => a.AssetId == id);
-            _context.Assets.Remove(asset);
-            _context.SaveChanges();
-            //删除资产相片
-            System.IO.File.Delete($"{_path}\\{asset.ImgName}");
-            TempData["Result"] = "固定资产信息删除成功!";
+            try
+            {
+                _context.Assets.Remove(asset);
+                _context.SaveChanges();
+                //删除资产相片
+                System.IO.File.Delete($"{_path}\\{asset.ImgName}");
+                TempData["Result"] = "固定资产信息删除成功!";
+            }
+            catch(Exception)
+            {
+                TempData["Result"] = "固定资产信息删除失败!";
+            }
             return RedirectToAction("AssetAdmin"); //重定向到资产管理页
         }
         

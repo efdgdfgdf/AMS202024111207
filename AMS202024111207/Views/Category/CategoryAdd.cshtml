@@ -1,5 +1,49 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@{
-}
+
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers 
+@model AMS202024111207.Models.Category
+@{ 
+    ViewData["Title"] = "添加资产类别"; 
+} 
+
+
+<div class="container mt-5 mb-5">
+    <h3>添加资产类别</h3>
+    @{
+        if (TempData["Result"] != null)
+        {
+            <span style="color: red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
+        }
+    }
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post" action="@Url.Action("CategoryAdd")">
+                <div asp-validation-summary="ModelOnly" class="text-danger" />
+
+                <div class="form-group">
+                    <!--资产类别名称-->
+                    <label asp-for="CategoryName" class="control-label"></label>
+                    <input asp-for="CategoryName" class="form-control" />
+                    <span asp-validation-for="CategoryName" class="text-danger"></span>
+                </div><br />
+
+                <div class="form-group">
+                    <!--资产类别说明-->
+                    <label asp-for="Description" class="control-label"></label>
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div><br />
+
+                <!--提交-->
+                <div class="form-group">
+                    <input type="submit" value="添加" class="btn btn-primary" />
+                    <a href="javascript:history.back(-1)" class="btn btn-danger">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

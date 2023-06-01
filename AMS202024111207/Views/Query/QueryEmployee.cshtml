@@ -1,5 +1,105 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model IEnumerable<AMS202024111207.Models.Employee>
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
+	ViewData["Title"] = "员工";
 }
+
+<!--margin-top:3-->
+<div class="container mt-5 mb-5">
+	<h3>员工</h3>
+	<span class="badge rounded-pill text-bg-primary">员工编号</span>
+	<span class="badge rounded-pill text-bg-secondary">用户名</span>
+	<span class="badge rounded-pill text-bg-success">姓名</span>
+	<span class="badge rounded-pill text-bg-danger">联络电话</span>
+	<span class="badge rounded-pill text-bg-warning">QQ邮箱</span>
+	<span class="badge rounded-pill text-bg-info">角色权限</span>
+	<span class="badge rounded-pill text-bg-light">关于我</span>
+	<span class="badge rounded-pill text-bg-dark">部门编号</span>
+	<hr />
+	<div class="row">
+		<form method="post" action="QueryEmployee">
+			🔍搜索（员工编号、姓名、联络电话等等）：<input type="text" name="keyword" value="@ViewBag.keyword" placeholder="请输入关键词" required>
+			<input type="submit" value="查询部门" class="btn btn-danger btn-xl" />
+			<a href="/Query/QueryEmployee" role="button" class="btn  btn-warning btn-xl">全部</a>
+		</form>
+	</div>
+	@if (ViewBag.employees != null && ViewBag.employees.Count > 0)
+	{
+		if (ViewBag.keyword != null)
+		{
+			<h3 style="font-weight: bold; /* 设置字体加粗 */margin-top: 20px; /* 上方留出一定的间距 */
+					margin-bottom: 30px; /* 下方留出一定的间距 */
+					color: #333; /* 设置文字颜色 */
+					text-shadow: 1px 1px 2px #ccc; /* 添加文本阴影效果 */">
+				查询结果：
+			</h3>
+		}
+		if (Model != null)
+		{
+			<table class="table table-hover" style="table-layout:fixed;">
+				<thead class="table-light">
+					<tr>
+						<td>员工编号</td>
+						<td>用户名</td>
+						<td>姓名</td>
+						<td>联络电话</td>
+						<td>注册日期</td>
+						<td>角色权限</td>
+						<td>所属部门</td>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>
+								@item.EmployeeId
+							</td>
+							<td>
+								@item.UserName
+							</td>
+							<td>
+								@item.Name
+							</td>
+							<td>
+								@item.Phone
+							</td>
+							<td>
+								@(((DateTime)item.JoinDate).ToString("yyyy-MM-dd"))
+							</td>
+							<td>
+								@item.Role
+							</td>
+							<td>
+								@item.Department.DepartmentName
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	}
+	else
+	{
+		<h3 style="font-weight: bold; /* 设置字体加粗 */margin-top: 20px; /* 上方留出一定的间距 */
+					margin-bottom: 30px; /* 下方留出一定的间距 */
+					color: #333; /* 设置文字颜色 */
+					text-shadow: 1px 1px 2px #ccc; /* 添加文本阴影效果 */">
+			查询结果：
+		</h3>
+		<span id="printing"></span>
+		<img src="https://cdnjson.com/images/2023/05/27/645907596997d.gif" alt="" style=" display: block; margin: 0 auto; " />
+	}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<script>
+	var typed = new Typed("#printing", {
+		//在了后面停顿三秒
+		strings: ["嘀嘀嘀，主机通讯中......^1000", "目前暂无此数据，可重新搜索试试🔍......"],
+		typeSpeed: 200,//打字的速度
+	});
+</script>

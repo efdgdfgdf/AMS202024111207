@@ -1,5 +1,99 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model IEnumerable<AMS202024111207.Models.Department>
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
+	ViewData["Title"] = "部门管理";
 }
+
+
+<!--margin-top:3-->
+<div class="container mt-5 mb-5">
+	<h3>部门管理</h3>
+	<span class="badge rounded-pill text-bg-primary">部门编号</span>
+	<span class="badge rounded-pill text-bg-danger">部门名称</span>
+	<span class="badge rounded-pill text-bg-success">部门主管</span>
+	<hr />
+	@{
+		if (TempData["Result"] != null)
+		{
+			<span style="color:red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
+		}
+	}
+	<div class="row">
+		<form method="post" action="DepartmentAdmin">
+			🔍搜索（部门名称、主管人等等）：<input type="text" name="keyword" value="@ViewBag.keyword" placeholder="请输入关键词" required>
+			<input type="submit" value="查询部门" class="btn btn-danger btn-xl" />
+			<a href="/Department/DepartmentAdmin" role="button" class="btn  btn-warning btn-xl">全部</a>
+			<a href="/Department/DepartmentAdd" role="button" class="btn btn-primary btn-xl">添加部门</a>
+		</form>
+	</div>
+	@if (ViewBag.departments != null && ViewBag.departments.Count > 0)
+	{
+		if (ViewBag.keyword != null)
+		{
+			<h3 style="font-weight: bold; /* 设置字体加粗 */margin-top: 20px; /* 上方留出一定的间距 */
+					margin-bottom: 30px; /* 下方留出一定的间距 */
+					color: #333; /* 设置文字颜色 */
+					text-shadow: 1px 1px 2px #ccc; /* 添加文本阴影效果 */">
+				查询结果：
+			</h3>
+		}
+		if (Model != null)
+		{
+			<table class="table table-hover" style="table-layout:fixed;">
+				<thead class="table-light">
+					<tr>
+						<td>部门编号</td>
+						<td>部门名称</td>
+						<td>部门主管</td>
+						<td>操作</td>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>
+								@item.DepartmentId
+							</td>
+							<td>
+								@item.DepartmentName
+							</td>
+							<td>
+								@item.Supervisor.UserName
+							</td>
+							<td>
+								<a href="/Department/DepartmentEdit?id=@item.DepartmentId" class="btn btn-sm btn-outline-primary">修改</a>
+								<a href="/Department/DepartmentDetails?id=@item.DepartmentId" class="btn btn-sm btn-outline-success">详情</a>
+								<a href="/Department/DepartmentDelete?id=@item.DepartmentId" class="btn btn-sm btn-outline-danger"
+					   onclick="return confirm('确定要删出部门  @item.DepartmentId - @item.DepartmentName 吗？');">删除</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	}
+	else
+	{
+		<h3 style="font-weight: bold; /* 设置字体加粗 */margin-top: 20px; /* 上方留出一定的间距 */
+					margin-bottom: 30px; /* 下方留出一定的间距 */
+					color: #333; /* 设置文字颜色 */
+					text-shadow: 1px 1px 2px #ccc; /* 添加文本阴影效果 */">
+			查询结果：
+		</h3>
+		<span id="printing"></span>
+		<img src="https://cdnjson.com/images/2023/05/27/645907596997d.gif" alt="" style=" display: block; margin: 0 auto; " />
+	}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<script>
+	var typed = new Typed("#printing", {
+		//在了后面停顿三秒
+		strings: ["嘀嘀嘀，主机通讯中......^1000", "目前暂无此数据，可重新搜索试试🔍......"],
+		typeSpeed: 200,//打字的速度
+	});
+</script>

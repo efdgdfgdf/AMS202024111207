@@ -9,7 +9,7 @@ namespace AMS202024111207.Controllers
 {
     [Authorize(Roles = "Admin,Member")]
     public class QueryController : Controller
-	{
+    {
         private readonly AmsDbContext _context;
         private IList<Asset> assets;
         private IList<Category> categories;
@@ -30,16 +30,22 @@ namespace AMS202024111207.Controllers
             {
                 //使用LINQ扩充方法，可多个字段查询
                 assets = _context.Assets.OrderBy(a => a.AssetId)
-                    .Where(a => a.AssetName.Contains(keyword) || a.Specification.Contains(keyword)|| a.Location.Contains(keyword) || a.CustodianId.Contains(keyword))
+                    .Where(a => a.AssetId.ToString().Contains(keyword) || a.AssetName.Contains(keyword) || a.Specification.Contains(keyword) || a.PurchaseDate.ToString().Contains(keyword) || a.Location.Contains(keyword) || a.Category.CategoryName.Contains(keyword) || a.Custodian.UserName.Contains(keyword) || a.Custodian.Department.DepartmentName.Contains(keyword))
                     .Include(a => a.Category).AsNoTracking()
+                    .Include(a => a.Category).AsNoTracking()
+                    .Include(a => a.Custodian).AsNoTracking()
+                    .Include(a => a.Custodian.Department).AsNoTracking()
                     .ToList();
                 ViewBag.keyword = keyword;
+                ViewBag.assets = assets;
                 return View(assets);
             }
             assets = _context.Assets.OrderBy(a => a.AssetId)
-             .Include(a => a.Category).AsNoTracking()
-             .Include(a => a.Custodian).AsNoTracking()
-             .ToList();
+            .Include(a => a.Category).AsNoTracking()
+            .Include(a => a.Custodian).AsNoTracking()
+            .Include(a => a.Custodian.Department).AsNoTracking()
+            .ToList();
+            ViewBag.assets = assets;
             return View(assets);
         }
 
@@ -50,12 +56,14 @@ namespace AMS202024111207.Controllers
             {
                 //使用LINQ扩充方法，可多个字段查询
                 categories = _context.Categories.OrderBy(c => c.CategoryId)
-                    .Where(c => c.CategoryName.Contains(keyword) || c.Description.Contains(keyword))
+                    .Where(c => c.CategoryId.ToString().Contains(keyword) || c.CategoryName.Contains(keyword) || c.Description.Contains(keyword))
                     .ToList();
                 ViewBag.keyword = keyword;
-                return View(assets);
+                ViewBag.categories = categories;
+                return View(categories);
             }
             categories = _context.Categories.OrderBy(c => c.CategoryId).ToList();
+            ViewBag.categories = categories;
             return View(categories);
         }
 
@@ -67,14 +75,17 @@ namespace AMS202024111207.Controllers
             {
                 //使用LINQ扩充方法，可多个字段查询
                 departments = _context.Departments.OrderBy(d => d.DepartmentId)
-                    .Where(c => c.DepartmentName.Contains(keyword) || c.SupervisorId.Contains(keyword))
+                    .Where(d => d.DepartmentId.ToString().Contains(keyword) || d.DepartmentName.Contains(keyword) || d.Supervisor.UserName.Contains(keyword))
+                    .Include(d => d.Supervisor).AsNoTracking()
                     .ToList();
                 ViewBag.keyword = keyword;
+                ViewBag.departments = departments;
                 return View(departments);
             }
             departments = _context.Departments.OrderBy(d => d.DepartmentId)
             .Include(d => d.Supervisor).AsNoTracking()
             .ToList();
+            ViewBag.departments = departments;
             return View(departments);
         }
 
@@ -86,14 +97,17 @@ namespace AMS202024111207.Controllers
             {
                 //使用LINQ扩充方法，可多个字段查询
                 employees = _context.Employees.OrderBy(e => e.EmployeeId)
-                    .Where(e => e.Name.Contains(keyword) || e.Phone.Contains(keyword) || e.Role.Contains(keyword))
-                    .ToList();
+                     .Where(e => e.EmployeeId.ToString().Contains(keyword) || e.UserName.Contains(keyword) || e.Name.Contains(keyword) || e.Phone.Contains(keyword) || e.Role.Contains(keyword) || e.Department.DepartmentName.Contains(keyword))
+                     .Include(e => e.Department)
+                     .ToList();
                 ViewBag.keyword = keyword;
+                ViewBag.employees = employees;
                 return View(employees);
             }
             employees = _context.Employees.OrderBy(e => e.EmployeeId)
             .Include(e => e.Department).AsNoTracking()
             .ToList();
+            ViewBag.employees = employees;
             return View(employees);
         }
     }

@@ -12,6 +12,11 @@ namespace AMS202024111207.Controllers
         private readonly AmsDbContext _context;
         private IList<Category> categories;
 
+        public CategoryController(AmsDbContext context, IHostEnvironment environment)
+        {
+            _context = context;
+        }
+
         /*  资产类别的CRUD  */
         //提交资产的表单
         public IActionResult CategoryAdd()
@@ -32,14 +37,19 @@ namespace AMS202024111207.Controllers
                     TempData["Result"] = "添加固定资产类别信息成功!";
                     return RedirectToAction("CategoryAdmin");//重定向到资产类别管理页
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    TempData["Result"] = "添加固定资产类别信息失败，信息有误!";
+                    TempData["Result"] = "添加固定资产类别信息失败!";
                 }
             }
             return View(category);
         }
 
+        public IActionResult CategoryDetails(int id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
+            return View(category);
+        }
         //修改资产信息
         public IActionResult CategoryEdit(int id)
         {
@@ -57,13 +67,20 @@ namespace AMS202024111207.Controllers
                 {
                     int categoryId = category.CategoryId;
                     var temp = _context.Categories.FirstOrDefault(c => c.CategoryId == categoryId);
-                    temp.CategoryName = category.CategoryName;
-                    temp.Description = category.Description;
-                    _context.SaveChanges();
-                    TempData["Result"] = "固定资产类别信息修改成功!";
+                    if (temp != null)
+                    {
+                        temp.CategoryName = category.CategoryName;
+                        temp.Description = category.Description;
+                        _context.SaveChanges();
+                        TempData["Result"] = "固定资产类别信息修改成功!";
+                    }
+                    else
+                    {
+                        TempData["Result"] = "此资产类别不存在!";
+                    }
                     return RedirectToAction("CategoryAdmin");//重定向到资产类别管理页
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     TempData["Result"] = "固定资产类别信息修改失败!";
                 }
@@ -78,12 +95,14 @@ namespace AMS202024111207.Controllers
             {
                 //使用LINQ扩充方法，可多个字段查询
                 categories = _context.Categories.OrderBy(c => c.CategoryId)
-                    .Where(c => c.CategoryName.Contains(keyword) || c.Description.Contains(keyword))
+                    .Where(c => c.CategoryId.ToString().Contains(keyword) || c.CategoryName.Contains(keyword) || c.Description.Contains(keyword))
                     .ToList();
                 ViewBag.keyword = keyword;
+                ViewBag.categories = categories;
                 return View(categories);
             }
             categories = _context.Categories.OrderBy(c => c.CategoryId).ToList();
+            ViewBag.categories = categories;
             return View(categories);
         }
 
@@ -91,9 +110,16 @@ namespace AMS202024111207.Controllers
         public IActionResult CategoryDelete(int id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
-            _context.Categories.Remove(category);
-            _context.SaveChanges();
-            TempData["Result"] = "固定资产类别信息删除成功!";
+            try
+            {
+                _context.Categories.Remove(category);
+                _context.SaveChanges();
+                TempData["Result"] = "固定资产类别信息删除成功!";
+            }
+            catch(Exception)
+            {
+                TempData["Result"] = "固定资产类别信息删除错误！请先清除属于资产类别--" + category.CategoryName + "的所有资产";
+            }
             return RedirectToAction("CategoryAdmin"); //重定向到资产管理页
         }
     }

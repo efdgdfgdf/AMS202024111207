@@ -11,6 +11,10 @@ namespace AMS202024111207.Controllers
     {
         private readonly AmsDbContext _context;
         private IList<Department> departments;
+        public DepartmentController(AmsDbContext context, IHostEnvironment environment)
+        {
+            _context = context;
+        }
 
         /*  部门的CRUD  */
         //提交资产的表单
@@ -32,11 +36,17 @@ namespace AMS202024111207.Controllers
                     TempData["Result"] = "添加部门信息成功!";
                     return RedirectToAction("DepartmentAdmin");//重定向到部门管理页
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    TempData["Result"] = "添加部门信息失败，信息有误!";
+                    TempData["Result"] = "添加部门信息失败";
                 }
             }
+            return View(department);
+        }
+
+        public IActionResult DepartmentDetails(int id)
+        {
+            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id);
             return View(department);
         }
 
@@ -57,13 +67,20 @@ namespace AMS202024111207.Controllers
                 {
                     int departmentId = department.DepartmentId;
                     var temp = _context.Departments.FirstOrDefault(d => d.DepartmentId == departmentId);
-                    temp.DepartmentName = department.DepartmentName;
-                    temp.SupervisorId = department.SupervisorId;
-                    _context.SaveChanges();
-                    TempData["Result"] = "部门信息修改成功!";
+                    if (temp != null)
+                    {
+                        temp.DepartmentName = department.DepartmentName;
+                        temp.SupervisorId = department.SupervisorId;
+                        _context.SaveChanges();
+                        TempData["Result"] = "部门信息修改成功!";
+                    }
+                    else
+                    {
+                        TempData["Result"] = "此部门不存在!";
+                    }
                     return RedirectToAction("DepartmentAdmin");//重定向到部门管理页
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     TempData["Result"] = "部门信息修改失败!";
                 }
@@ -78,14 +95,17 @@ namespace AMS202024111207.Controllers
             {
                 //使用LINQ扩充方法，可多个字段查询
                 departments = _context.Departments.OrderBy(d => d.DepartmentId)
-                    .Where(c => c.DepartmentName.Contains(keyword) || c.SupervisorId.Contains(keyword))
+                    .Where(d => d.DepartmentId.ToString().Contains(keyword) || d.DepartmentName.Contains(keyword) || d.Supervisor.UserName.Contains(keyword))
+                    .Include(d => d.Supervisor).AsNoTracking()
                     .ToList();
                 ViewBag.keyword = keyword;
+                ViewBag.departments = departments;
                 return View(departments);
             }
             departments = _context.Departments.OrderBy(d => d.DepartmentId)
             .Include(d => d.Supervisor).AsNoTracking()
             .ToList();
+            ViewBag.departments = departments;
             return View(departments);
         }
 
@@ -93,9 +113,16 @@ namespace AMS202024111207.Controllers
         public IActionResult DepartmentDelete(int id)
         {
             var departments = _context.Departments.FirstOrDefault(d => d.DepartmentId == id);
-            _context.Departments.Remove(departments);
-            _context.SaveChanges();
-            TempData["Result"] = "部门信息删除成功!";
+            try
+            {
+                _context.Departments.Remove(departments);
+                _context.SaveChanges();
+                TempData["Result"] = "部门信息删除成功!";
+            }
+            catch (Exception)
+            {
+                TempData["Result"] = "部门信息删除失败！请先删除部门主管--" + departments.Supervisor.UserName+ "的员工信息";
+            }
             return RedirectToAction("DepartmentAdmin"); //重定向到部门管理页
         }
     }

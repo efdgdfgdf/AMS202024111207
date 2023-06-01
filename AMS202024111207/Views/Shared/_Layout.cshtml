@@ -1,102 +1,42 @@
-﻿@using System.Security.Claims
-@*
+﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@using AMS202024111207.Models
+@using System.Security.Claims
+@inject AmsDbContext _context
+
 @{
 	var roles = User.FindFirst(ClaimTypes.Role)?.Value;
+	var employee = _context.Employees.FirstOrDefault(e => e.UserName == User.Identity.Name);  //取当前用户的详细信息
+	string avatar = "https://dn-qiniu-avatar.qbox.me/avatar/";
+	if (employee != null)
+	{
+		if (employee.Qqemail != null)
+		{
+			avatar = $"https://q1.qlogo.cn/g?b=qq&nk={employee.Qqemail.Split('@')[0]}&s=100&t=1547904810"; //通过API取得QQ头像
+		}
+	}
+
 }
 <html>
 <head>
 	<meta name="viewport" content="width=device-width" />
-	<title>AMS - @ViewData["Title"]</title>
+	<title>AssetPro - @ViewData["Title"]</title>
 	<!--网站图标icon-->
 	<link rel="shortcut icon" href="https://cdn3.iconfinder.com/data/icons/asset/512/intangible-assets-trademark-knowledge-64.png">
 	<link href="~/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 	<link href="~/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
-	<script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="~/css/global.css" />
+	<link rel="stylesheet" type="text/css" href="~/lib/fancybox/jquery.fancybox.min.css">
+	<link href="~/lib/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
 </head>
 <body>
 	<!--页首及导览区块-->
-	@*<nav id="header" class="sticky-top theme-colored navbar navbar-expand-lg navbar-dark">
-	<div class="d-flex align-items-center container">
-	<button aria-controls="navBarContent" id="navBarToggle" type="button" aria-label="Toggle navigation" class="answer-navBar me-2 navbar-toggler collapsed">
-	<span class="navbar-toggler-icon"></span>
-	</button>
-	<div class="d-flex justify-content-between align-items-center nav-grow flex-nowrap">
-	<a class="lh-1 me-0 me-sm-3 navbar-brand" href="/Home/Index">
-	<span>AMS</span>
-	</a>
-	<div class="d-flex lg-none align-items-center flex-lg-nowrap">
-	<div class="flex-row navbar-nav">
-	<a class="icon-link d-flex align-items-center justify-content-center p-0 me-3 position-relative nav-link" href="/users/notifications/inbox">
-	<i class="br bi-bell-fill fs-4" title=""></i>
-	</a>
-	<a class="icon-link d-flex align-items-center justify-content-center p-0 me-3 position-relative nav-link" href="/users/notifications/achievement">
-	<i class="br bi-trophy-fill fs-4" title=""></i>
-	</a>
-	</div>
-	<div class="dropdown">
-	<a class="no-toggle pointer dropdown-toggle" id="dropdown-basic" aria-expanded="false" variant="success">
-	<img src="https://answer.zeabur.app/uploads/avatar/4RtvjABXLn7.jpg?s=96" width="36px" height="36px" class="rounded" alt="">
-	</a>
-	</div>
-	</div>
-	</div>
-	<div class="me-auto navbar-collapse collapse" id="navBarContent">
-	<hr class="hr lg-none mb-2" style="margin-top: 12px;">
-	<div class="col-md-4">
-	<div class="navbar-nav">
-	<a class="nav-link" href="/Home/Index">主页</a>
-	<a class="nav-link" href="/Member/AssetAdmin">资产管理</a>
-	<a class="nav-link" href="/Admin/DepartmentAdmin">部门管理</a>
-	<a class="nav-link" href="/Admin/CategoryAdmin">资产类别管理</a>
-	<a class="nav-link active" href="/Home/Users" aria-current="page">用户</a>
-	</div>
-	</div>
-	<hr class="hr lg-none mt-2">
-	<div class="d-flex justify-content-center col-lg-4">
-	<form action="/search" class="w-75 px-0 px-lg-2">
-	<input placeholder="搜索" name="q" class="placeholder-search form-control" value="">
-	</form>
-	</div>
-	<div class="lg-none mt-3 pb-1 nav-item">
-	<a class="text-capitalize text-nowrap btn btn-light" href="/questions/ask">添加资产</a>
-	</div>
-	<div class="d-none d-lg-flex justify-content-start justify-content-sm-end col-lg-4">
-	<div class="d-flex align-items-center flex-lg-nowrap navbar-nav">
-	<div class="me-3 nav-item">
-	<a class="text-capitalize text-nowrap btn btn-light" href="/questions/ask">添加资产</a>
-	</div>
-	<div class="flex-row navbar-nav">
-	<a class="icon-link d-flex align-items-center justify-content-center p-0 me-3 position-relative nav-link" href="/users/notifications/inbox">
-	<i class="br bi-bell-fill fs-4" title=""></i>
-	</a>
-	<a class="icon-link d-flex align-items-center justify-content-center p-0 me-3 position-relative nav-link" href="/users/notifications/achievement">
-	<i class="br bi-trophy-fill fs-4" title=""></i>
-	</a>
-	</div>
-	<div class="dropdown">
-	<a class="no-toggle pointer dropdown-toggle" id="dropdown-basic" aria-expanded="false" variant="success">
-	<img src="https://answer.zeabur.app/uploads/avatar/4RtvjABXLn7.jpg?s=96" width="36px" height="36px" class="rounded" alt="">
-	</a>
-	<div aria-labelledby="dropdown-basic" data-bs-popper="static" class="dropdown-menu dropdown-menu-end">
-	<a href="/users/lindap" data-rr-ui-dropdown-item="" class="dropdown-item">用户主页</a>
-	<a href="/users/settings/profile" data-rr-ui-dropdown-item="" class="dropdown-item">账号设置</a>
-	<a href="/admin" data-rr-ui-dropdown-item="" class="dropdown-item">后台管理</a>
-	<a href="/review" data-rr-ui-dropdown-item="" class="position-relative dropdown-item">审查</a>
-	<hr class="dropdown-divider" role="separator">
-	<a data-rr-ui-dropdown-item="" class="dropdown-item" role="button" tabindex="0" href="#">退出登录</a>
-	</div>
-	</div>
-	</div>
-	</div>
-	</div>
-	</div>
-	</nav>*@
-
-	<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark border-bottom box-shadow mb-3" style="background: linear-gradient(112deg,#36d1dc,#5b86e5);">
+	<nav class="navbar navbar-expand-md navbar-dark sticky-lg-top" style="background: #3094f1;">
 		<div class="container">
-			<a class="navbar-brand" href="/Home/Index">固定资产管理</a>
+			<a class="navbar-brand" href="/Home/Index">AssetPro</a>
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
 					aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -107,51 +47,76 @@
 						<a class="nav-link text-light" href="/Home/Index">首页</a>
 					</li>
 					<li class="nav-item">
-						@if (roles == "admin")
+						@if (roles == "Admin")
 						{
 							<a class="nav-link text-light" href="/Asset/AssetAdmin">资产管理</a>
 						}
 						else
 						{
-							<a class="nav-link text-light" href="/Query/QueryAssetAdmin">资产管理</a>
+							<a class="nav-link text-light" href="/Query/QueryAsset">资产</a>
 						}
 					</li>
 					<li class="nav-item">
-						@if (roles == "admin")
+						@if (roles == "Admin")
 						{
 							<a class="nav-link text-light" href="/Category/CategoryAdmin">资产类别管理</a>
 						}
 						else
 						{
-							<a class="nav-link text-light" href="/Query/QueryCategoryAdmin">资产类别管理</a>
+							<a class="nav-link text-light" href="/Query/QueryCategory">资产类别</a>
 						}
 					</li>
 					<li class="nav-item">
-						@if (roles == "admin")
+						@if (roles == "Admin")
 						{
 							<a class="nav-link text-light" href="/Department/DepartmentAdmin">部门管理</a>
 						}
 						else
 						{
-							<a class="nav-link text-light" href="/Query/QueryDepartmentAdmin">部门管理</a>
+							<a class="nav-link text-light" href="/Query/QueryDepartment">部门</a>
 						}
 					</li>
 					<li class="nav-item">
-						@if (roles == "admin")
+						@if (roles == "Admin")
 						{
 							<a class="nav-link text-light" href="/Employee/EmployeeAdmin">员工管理</a>
 						}
 						else
 						{
-							<a class="nav-link text-light" href="/Query/QueryCategoryAdmin">员工管理</a>
+							<a class="nav-link text-light" href="/Query/QueryEmployee">员工</a>
 						}
 					</li>
 				</ul>
 				<!--登录-->
-				@if (User.Identity.IsAuthenticated){
+				@if (User.Identity.IsAuthenticated)
+				{
 					<span style="color:#fff;">@User.Identity.Name 欢迎登录！</span>
-					<a href="/Home/Logout" style="color:yellow">[注销]</a>
-				}	
+					<div class="d-none d-lg-flex justify-content-start justify-content-sm-end">
+						<div class="d-flex align-items-center flex-lg-nowrap navbar-nav">
+							<div class="nav-item dropdown">
+								<a class="nav-link no-toggle pointer dropdown-toggle" id="dropdown-basic"  variant="success" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+									<img src=@avatar width="36px" height="36px" class="rounded" alt="">
+								</a>
+								<div aria-labelledby="dropdown-basic" data-bs-popper="static" class="dropdown-menu dropdown-menu-end">
+									<a href="/Home/Users" data-rr-ui-dropdown-item="" class="dropdown-item">用户主页</a>
+									<a href="/Home/Settings?id=@employee.EmployeeId" data-rr-ui-dropdown-item="" class="dropdown-item">账号设置</a>
+									<a href="#!" data-rr-ui-dropdown-item="" class="dropdown-item">后台管理</a>
+									<a href="#!" data-rr-ui-dropdown-item="" class="position-relative dropdown-item">审查</a>
+									<hr class="dropdown-divider" role="separator">
+									<a data-rr-ui-dropdown-item="" class="dropdown-item" role="button" tabindex="0" href="/Home/Logout">退出登录</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+				else
+				{
+					<ul class="navbar-nav flex-grow-2">
+						<li class="nav-item">
+							<a class="nav-link text-light" href="/Home/Login"><i class="bi bi-person-circle"></i> 登录</a>
+						</li>
+					</ul>
+				}
 			</div>
 		</div>
 	</nav>
@@ -162,14 +127,63 @@
 	</div>
 	<!--内容区块结束-->
 	<!--页脚区块-->
-	<footer class="bg-light py-3">
-		<div class="container">
-			<p class="text-center mb-0 fs-14 text-secondary">
-				基于
-				<a href="#" target="_blank">ASP.NET Core MVC</a> - 固定资产管理系统软件。<br>Made with love © 2023 Sunshine.
-			</p>
+	@*	<footer class="bg-light py-3">
+	<div class="container">
+	<p class="text-center mb-0 fs-14 text-secondary">
+	基于
+	<a href="#" target="_blank">ASP.NET Core MVC</a> - 固定资产管理系统 Made with love © 2023 Sunshine.
+	</p>
+	</div>
+	</footer>*@
+	<footer class="bg-light py-4 mt-auto">
+		<div class="container px-5">
+			<div class="row align-items-center justify-content-between flex-column flex-sm-row">
+				<div class="col-auto"><div class="small m-0">Copyright &copy; AssetPro 2023 版权所有。保留所有权利。</div></div>
+				<div class="col-auto">
+					<a class="small" href="#!" style="text-decoration: none; ">Privacy</a>
+					<span class="mx-1">&middot;</span>
+					<a class="small" href="#!" style="text-decoration: none; ">Terms</a>
+					<span class="mx-1">&middot;</span>
+					<a class="small" href="#!" style="text-decoration: none; ">Contact</a>
+					<span class="mx-1">&middot;</span>
+					<a class="small" href="#" style="text-decoration: none; ">Top</a>
+				</div>
+			</div>
 		</div>
 	</footer>
 	<!--页脚区块结束-->
+
+	<script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+	<script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="~/lib/jquery/jquery.min.js"></script>
+	<script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
+	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+	<script src="~/lib/fancybox/jquery.fancybox.min.js"></script>
+	<script src="~/lib/sweetalert2/sweetalert2.all.js"></script>
+	<script>
+		//图片放大
+		Fancybox.bind('[data-fancybox="gallery"]', {
+			// Options will go here
+			selector: '[data-fancybox="images"]',
+			loop: true
+		});
+		$("[data-fancybox]").fancybox({
+			// Options will go here
+		});
+
+		//欢迎弹窗
+		$(document).ready(function () {
+			// 判断当前日期是否是南京大屠杀纪念日：12月13日
+			var now = new Date();
+			if (now.getMonth() == 11 && now.getDate() == 13) {
+				// 显示弹窗
+				Swal.fire({
+					title: "今天是南京大屠杀" + (now.getFullYear() - 1937).toString() + "周年纪念日",
+					text: "勿忘国耻，振兴中华",
+					icon: "warning"
+				});
+			}
+		});
+	</script>
 </body>
 </html>

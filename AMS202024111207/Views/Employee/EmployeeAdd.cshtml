@@ -1,5 +1,107 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@model AMS202024111207.Models.Employee
+@using AMS202024111207.Models
+@inject AmsDbContext _context
+
 @{
+	ViewData["Title"] = "添加员工";
+	var departments = _context.Departments.ToList();
 }
+
+<div class="container mt-5 mb-5">
+	<h3>添加员工</h3>
+	@{
+		if (TempData["Result"] != null)
+		{
+			<span style="color: red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
+		}
+	}
+	<hr />
+	<div class="row">
+		<div class="col-md-4">
+			<form method="post" action="@Url.Action("EmployeeAdd")">
+				<div asp-validation-summary="ModelOnly" class="text-danger" />
+
+				<div class="form-group">
+					<!--用户名-->
+					<label asp-for="UserName" class="control-label"></label>
+					<input asp-for="UserName" class="form-control" />
+					<span asp-validation-for="UserName" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--密码-->
+					<label asp-for="Password" class="control-label"></label>
+					<input asp-for="Password" type="password" class="form-control is-valid" />
+					<span asp-validation-for="Password" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--姓名-->
+					<label asp-for="Name" class="control-label"></label>
+					<div class="input-group">
+						<div class="input-group-text">@@</div>
+						<input asp-for="Name" class="form-control"  placeholder="昵称">
+					</div>
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--联络电话-->
+					<label asp-for="Phone" class="control-label"></label>
+					<input asp-for="Phone" class="form-control" type="tel" placeholder="手机号码或电话☎️" />
+					<span asp-validation-for="Phone" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--QQ邮箱-->
+					<label asp-for="Qqemail" class="control-label"></label>
+					<input asp-for="Qqemail" class="form-control" type="email" />
+					<span asp-validation-for="Qqemail" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--角色权限-->
+					<label asp-for="Role" class="control-label"></label><br />
+					<div class="form-check form-check-inline">
+						<input asp-for="Role" class="form-check-input" type="radio" id="admin" value="Admin" checked>
+						<label class="form-check-label" for="admin">管理员</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input asp-for="Role" class="form-check-input" type="radio" id="member" value="Member">
+						<label class="form-check-label" for="member">普通员工</label>
+					</div>
+					<span asp-validation-for="Role" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--关于我-->
+					<label asp-for="About" class="control-label"></label>
+					<textarea asp-for="About" class="form-control" rows="5"></textarea>
+					<span asp-validation-for="About" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--所属部门编号-->
+					所属部门
+					<select asp-for="DepartmentId" class="form-select">
+						@foreach (var item in departments)
+						{
+							<option value="@item.DepartmentId">@item.DepartmentName</option>
+						}
+					</select>
+				</div><br />
+
+				<!--提交-->
+				<div class="form-group">
+					<input type="submit" value="添加" class="btn btn-primary" />
+					<a href="javascript:history.back(-1)" class="btn btn-danger">取消</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+

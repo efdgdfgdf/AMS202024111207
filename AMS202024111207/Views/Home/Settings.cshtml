@@ -1,0 +1,96 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
+@model AMS202024111207.Models.Employee
+@using AMS202024111207.Models
+@using System.Security.Claims
+@inject AmsDbContext _context
+
+@{
+	ViewData["Title"] = "设置个人资料";
+	var departments = _context.Departments.ToList();
+	var roles = User.FindFirst(ClaimTypes.Role)?.Value;
+}
+
+<div class="container mt-5 mb-5">
+	<h3>设置个人资料</h3>
+	@{
+		@if (TempData["Result"] != null)
+		{
+			<script>
+				// 显示弹窗
+				swal("Good job!", @TempData["Result"], "success");
+			</script>
+		}
+	}
+	<hr />
+	<div class="row">
+		<div class="col-md-5">
+			<form method="post" asp-action="Settings">
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+				<input type="hidden" asp-for="EmployeeId" />
+
+				<div class="form-group">
+					<!--用户名-->
+					<label asp-for="UserName" class="control-label"></label>
+					<input asp-for="UserName" class="form-control" />
+					<span asp-validation-for="UserName" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--密码-->
+					<label asp-for="Password" class="control-label"></label>
+					<input asp-for="Password" class="form-control" />
+					<span asp-validation-for="Password" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--姓名-->
+					<label asp-for="Name" class="control-label"></label>
+					<div class="input-group">
+						<div class="input-group-text">@@</div>
+						<input asp-for="Name" class="form-control"  placeholder="昵称">
+					</div>
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--联络电话-->
+					<label asp-for="Phone" class="control-label"></label>
+					<input asp-for="Phone" class="form-control" />
+					<span asp-validation-for="Phone" class="text-danger"></span>
+				</div><br />
+
+				<div class="form-group">
+					<!--QQ邮箱-->
+					<label asp-for="Qqemail" class="control-label"></label>
+					<input asp-for="Qqemail" class="form-control" type="email" />
+					<span asp-validation-for="Qqemail" class="text-danger"></span>
+				</div><br />
+
+				<input type="hidden" asp-for="JoinDate" />
+
+				<input type="hidden" asp-for="Role" />
+
+				<div class="form-group">
+					<!--关于我-->
+					<label asp-for="About" class="control-label"></label>
+					<textarea asp-for="About" class="form-control" rows="5"></textarea>
+					<span asp-validation-for="About" class="text-danger"></span>
+				</div><br />
+
+				<input type="hidden" asp-for="DepartmentId" />
+
+				<!--提交修改-->
+				<div class="form-group">
+					<input type="submit" value="保存" class="btn btn-primary" />
+					<a href="/Home/Users?id=@Model.EmployeeId" class="btn btn-danger">返回</a>
+					<input type="reset" class="btn btn-warning" value="重置" />
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

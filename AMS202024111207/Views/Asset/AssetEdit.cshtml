@@ -11,9 +11,9 @@
 	var employees = _context.Employees.ToList();
 	var categories = _context.Categories.ToList();
 }
-
+<link rel="stylesheet" type="text/css" href="~/lib/fancybox/jquery.fancybox.min.css">
 <div class="container mt-5 mb-5">
-	<h3>修改相片</h3>
+	<h3>修改资产信息</h3>
 	@{
 		if (TempData["Result"] != null)
 		{
@@ -42,7 +42,7 @@
 
 				<div class="form-group">
 					<label asp-for="Price" class="control-label"></label>
-					<input asp-for="Price" class="form-control" />
+					<input asp-for="Price" class="form-control" type="number"/>
 					<span asp-validation-for="Price" class="text-danger"></span>
 				</div><br />
 
@@ -75,20 +75,47 @@
 					<select asp-for="CustodianId" class="form-select">
 						@foreach (var item in employees)
 						{
-							<option value="@item.EmployeeId">@item.EmployeeId</option>
+							<option value="@item.EmployeeId">@item.UserName</option>
 						}
 					</select>
 				</div><br />
 
-				<label asp-for="ImgName" class="control-label"></label>
-				<img src="~/images/@Model.ImgName" alt="" style="width:415px;" />
-				<a style="color:cornflowerblue; text-align:center;">@Model.ImgName</a><br /><br />
+				<label class="control-label">资产图片</label>
+				<a href="~/images/@Model.ImgName" data-fancybox data-caption="~ /images/@Model.ImgName">
+					<img src="~/images/@Model.ImgName" alt="" style="width:415px;" />
+				</a><br />
+
+				@*<div class="form-group">
+					<label asp-for="ImgName" class="control-label"></label>
+					<input asp-for="ImgName" class="form-control" />
+					<span asp-validation-for="ImgName" class="text-danger"></span>
+				</div><br />*@
+				<input type="hidden" asp-for="ImgName" />
 
 				<div class="form-group">
-					<input type="file" name="imgFile" />
-					<input type="submit" value="提交修改" class="btn btn-primary" />
+					<label for="formFile" class="form-label">修改图片</label>
+					<input type="file" name="imgFile" accept=".png,.jpg,.gif" id="uploadFile" onchange="checkFileType()" class="form-control"/>
+				</div><br />
+				
+				<div class="form-group right-panel">
+					<input type="submit" value="修改" class="btn btn-primary" />
+					<a href="javascript:history.back(-1)" class="btn btn-danger">取消</a>
+					<input type="reset" class="btn btn-warning" value="重置" />
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
+
+<script>
+	function checkFileType() {
+		const allowedTypes = ["image/png", "image/jpeg", "image/gif"];
+		const fileInput = document.getElementById("uploadFile");
+		const chosenFile = fileInput.files[0];
+		if (chosenFile && !allowedTypes.includes(chosenFile.type)) {
+			alert("请上传.png, .jpg, .gif 格式的文件！");
+			fileInput.value = "";
+		}
+	}
+</script>
+

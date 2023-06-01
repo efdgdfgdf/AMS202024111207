@@ -36,10 +36,7 @@ public partial class AmsDbContext : DbContext
             entity.Property(e => e.AssetId).HasColumnName("AssetID");
             entity.Property(e => e.AssetName).HasMaxLength(30);
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
-            entity.Property(e => e.CustodianId)
-                .HasMaxLength(20)
-                .IsFixedLength()
-                .HasColumnName("CustodianID");
+            entity.Property(e => e.CustodianId).HasColumnName("CustodianID");
             entity.Property(e => e.ImgName).HasMaxLength(50);
             entity.Property(e => e.Location).HasMaxLength(200);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
@@ -72,10 +69,7 @@ public partial class AmsDbContext : DbContext
 
             entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
             entity.Property(e => e.DepartmentName).HasMaxLength(50);
-            entity.Property(e => e.SupervisorId)
-                .HasMaxLength(20)
-                .IsFixedLength()
-                .HasColumnName("SupervisorID");
+            entity.Property(e => e.SupervisorId).HasColumnName("SupervisorID");
 
             entity.HasOne(d => d.Supervisor).WithMany(p => p.Departments)
                 .HasForeignKey(d => d.SupervisorId)
@@ -88,16 +82,32 @@ public partial class AmsDbContext : DbContext
 
             entity.ToTable("Employee");
 
-            entity.Property(e => e.EmployeeId)
-                .HasMaxLength(20)
-                .IsFixedLength()
-                .HasColumnName("EmployeeID");
+            entity.HasIndex(e => e.UserName, "UK_dbo.Employee_UserName").IsUnique();
+
+            entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
             entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
-            entity.Property(e => e.Name).HasMaxLength(50);
-            entity.Property(e => e.Password).HasMaxLength(50);
-            entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.JoinDate).HasColumnType("date");
+            entity.Property(e => e.Name)
+                .HasMaxLength(30)
+                .IsFixedLength();
+            entity.Property(e => e.Password)
+                .HasMaxLength(15)
+                .IsUnicode(false)
+                .IsFixedLength();
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .IsFixedLength();
+            entity.Property(e => e.Qqemail)
+                .HasMaxLength(25)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("QQemail");
             entity.Property(e => e.Role)
                 .HasMaxLength(10)
+                .IsFixedLength();
+            entity.Property(e => e.UserName)
+                .HasMaxLength(20)
                 .IsFixedLength();
 
             entity.HasOne(d => d.Department).WithMany(p => p.Employees)

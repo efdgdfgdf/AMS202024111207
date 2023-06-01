@@ -5,38 +5,52 @@
 @using AMS202024111207.Models
 @addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 @inject AmsDbContext _context
+
 @{
 	ViewData["Title"] = "资产管理";
 }
 
-<style>
-	.table td, .table th {
-		text-align: center;
-		vertical-align: middle;
-	}
-</style>
-<!--margin-top:3-->
+
+<!--margin-top:5-->
 <div class="container mt-5 mb-5">
 	<h3>资产管理</h3>
+	<span class="badge rounded-pill text-bg-primary">资产编号</span>
+	<span class="badge rounded-pill text-bg-secondary">资产名称</span>
+	<span class="badge rounded-pill text-bg-success">资产规格</span>
+	<span class="badge rounded-pill text-bg-danger">价格</span>
+	<span class="badge rounded-pill text-bg-warning">购入日期</span>
+	<span class="badge rounded-pill text-bg-info">存放位置</span>
+	<span class="badge rounded-pill text-bg-light">资产类别</span>
+	<span class="badge rounded-pill text-bg-dark">资产保管人</span>
+	<hr />
 	@{
 		if (TempData["Result"] != null)
 		{
 			<span style="color:red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
 		}
 	}
-	<hr />
 	<div class="row">
 		<form method="post" action="AssetAdmin">
-			输入关键词（如电脑、座椅）：<input type="text" name="keyword" value="@ViewBag.keyword" required>
-			<input type="submit" value="查询资产" class="btn btn-primary btn-sm">
-			<a href="/Admin/AssetAdmin" role="button" class="btn btn-primary btn-sm">全部</a>
-			<a href="/Admin/AssetAdd" role="button" class="btn btn-primary btn-sm">添加资产</a>
+			🔍搜索（名称、类别、资产保管人等等）：<input type="text" name="keyword" value="@ViewBag.keyword" placeholder="请输入关键词" required>
+			<input type="submit" value="查询资产" class="btn btn-danger btn-xl" />
+			<a href="/Asset/AssetAdmin" role="button" class="btn  btn-warning btn-xl">全部</a>
+			<a href="/Asset/AssetAdd" role="button" class="btn btn-primary btn-xl">添加资产</a>
 		</form>
 	</div>
-	@{
+	@if (ViewBag.assets != null && ViewBag.assets.Count > 0)
+	{
+		if (ViewBag.keyword != null)
+		{
+			<h3 style="font-weight: bold; /* 设置字体加粗 */margin-top: 20px; /* 上方留出一定的间距 */
+					margin-bottom: 30px; /* 下方留出一定的间距 */
+					color: #333; /* 设置文字颜色 */
+					text-shadow: 1px 1px 2px #ccc; /* 添加文本阴影效果 */">
+				查询结果：
+			</h3>
+		}
 		if (Model != null)
 		{
-			<table class="table table-hover">
+			<table class="table table-hover" style="table-layout:fixed;">
 				<thead class="table-light">
 					<tr>
 						<td>资产编号</td>
@@ -48,6 +62,7 @@
 						<td>资产类别</td>
 						<td>资产图片</td>
 						<td>资产保管人</td>
+						<td>所属部门</td>
 						<td>操作</td>
 					</tr>
 				</thead>
@@ -68,7 +83,7 @@
 								@item.Price
 							</td>
 							<td>
-								@item.PurchaseDate
+								@(((DateTime)item.PurchaseDate).ToString("yyyy-MM-dd"))
 							</td>
 							<td>
 								@item.Location
@@ -77,20 +92,63 @@
 								@item.Category.CategoryName
 							</td>
 							<td>
-								<img src="~/images/@item.ImgName" style="max-width: 70%; height: auto;" />
+								<a href="~/images/@item.ImgName" data-fancybox="gallery" data-caption="@item.ImgName">
+									<img src="~/images/@item.ImgName" style="width: 100%; " />
+								</a>
 							</td>
 							<td>
-								@item.Custodian.EmployeeId
+								@item.Custodian.UserName
 							</td>
 							<td>
-								<a href="/Admin/AssetEdit?id=@item.AssetId" class="btn btn-sm btn-outline-primary">修改</a>
-								<a href="/Admin/AssetDelete?id=@item.AssetId" class="btn btn-sm btn-outline-danger"
-					   	onclick="return confirm('确定要删出相片  @item.AssetId - @item.AssetName 吗？');">删除</a>
+								@item.Custodian.Department.DepartmentName
+							</td>
+							<td>
+								<a href="/Asset/AssetEdit?id=@item.AssetId" class="btn btn-sm btn-outline-primary">修改</a>
+								<a href="/Asset/AssetDetails?id=@item.AssetId" class="btn btn-sm btn-outline-success">详情</a>
+								<a href="/Asset/AssetDelete?id=@item.AssetId" class="btn btn-sm btn-outline-danger"
+					   onclick="return confirm('确定要删出资产  @item.AssetId - @item.AssetName 吗？');">删除</a>
 							</td>
 						</tr>
 					}
 				</tbody>
 			</table>
+			<!--分页-->
+			<nav aria-label="Page navigation example">
+				<ul class="pagination justify-content-center">
+					<li class="page-item">
+						<a class="page-link" href="#" aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+						</a>
+					</li>
+					<li class="page-item"><a class="page-link" href="#">1</a></li>
+					<li class="page-item"><a class="page-link" href="#">2</a></li>
+					<li class="page-item"><a class="page-link" href="#">3</a></li>
+					<li class="page-item">
+						<a class="page-link" href="#" aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
 		}
 	}
+	else
+	{
+		<h3 style="font-weight: bold; /* 设置字体加粗 */margin-top: 20px; /* 上方留出一定的间距 */
+					margin-bottom: 30px; /* 下方留出一定的间距 */
+					color: #333; /* 设置文字颜色 */
+					text-shadow: 1px 1px 2px #ccc; /* 添加文本阴影效果 */">
+			查询结果：
+		</h3>
+		<span id="printing"></span>
+		<img src="https://cdnjson.com/images/2023/05/27/645907596997d.gif" alt="" style=" display: block; margin: 0 auto; " />
+	}
 </div>
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<script>
+	var typed = new Typed("#printing", {
+		//在了后面停顿三秒
+		strings: ["嘀嘀嘀，主机通讯中......^1000", "目前暂无此数据，可重新搜索试试🔍......"],
+		typeSpeed: 200,//打字的速度
+	});
+</script>

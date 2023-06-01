@@ -21,6 +21,16 @@
     {
       "library": "bootstrap-icons@1.10.5",
       "destination": "wwwroot/lib/bootstrap-icons/"
+    },
+    {
+      "library": "fancybox@3.5.7",
+      "destination": "wwwroot/lib/fancybox/"
     }
-  ]
+  ,
+{
+  "provider": "cdnjs",
+  "library": "sweetalert2@11.7.10",
+  "destination": "wwwroot/lib/sweetalert2/"
+}
+]
 }
