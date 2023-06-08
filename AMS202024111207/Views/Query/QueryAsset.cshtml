@@ -2,7 +2,6 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @model IEnumerable<AMS202024111207.Models.Asset>
-@addTagHelper *,Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
 	ViewData["Title"] = "资产";
@@ -23,12 +22,31 @@
 	<hr />
 	<div class="row">
 		<form method="post" action="QueryAsset">
-			🔍搜索（名称、类别、资产保管人等等）：<input type="text" name="keyword" value="@ViewBag.keyword" placeholder="请输入关键词" required>
-			<input type="submit" value="查询资产" class="btn btn-danger btn-xl" />
-			<a href="/Query/QueryAsset" role="button" class="btn  btn-warning btn-xl">全部</a>
+			<div class="form-group row">
+				<label for="keyword" class="col-sm-2 col-form-label">🔍搜索</label>
+				<div class="col-sm-4">
+					<input type="text" name="keyword" id="keyword" class="form-control" value="@ViewBag.keyword" placeholder="请输入关键词" required>
+				</div>
+			</div>
+			<br />
+			<div class="form-group row">
+				<label for="field" class="col-sm-2 col-form-label">查询字段</label>
+				<div class="col-sm-4">
+					<select name="field" id="field" class="form-select">
+						@foreach (var option in ViewData["options"] as SelectList)
+						{
+							<option value="@option.Value" @(option.Value == ViewBag.field ? "selected" : "")>@option.Text</option>
+						}
+					</select>
+				</div>
+				<div class="col-sm-4">
+					<button type="submit" class="btn btn-danger">查询资产</button>
+					<a href="/Query/QueryAsset" role="button" class="btn btn-warning">全部</a>
+				</div>
+			</div>
 		</form>
 	</div>
-	@if (ViewBag.assets != null && ViewBag.assets.Count > 0)
+	@if (ViewBag.result)
 	{
 		if (ViewBag.keyword != null){
 			<h3 style="font-weight: bold; /* 设置字体加粗 */margin-top: 20px; /* 上方留出一定的间距 */
@@ -43,16 +61,109 @@
 			<table class="table table-hover" style="table-layout:fixed;">
 				<thead class="table-light">
 					<tr>
-						<td>资产编号</td>
-						<td>资产名称</td>
-						<td>资产规格</td>
-						<td>价格</td>
-						<td>购入日期</td>
-						<td>存放位置</td>
-						<td>资产类别</td>
-						<td>资产图片</td>
-						<td>资产保管人</td>
-						<td>所属部门</td>
+						<th>
+							@if (ViewBag.keyword != null )
+							{
+								@if (ViewBag.SortOrder == "AssetIdAsc")
+								{
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "AssetIdDesc", field = ViewBag.Field, page = ViewBag.page })">
+										资产编号 <i class="fa fa-sort-asc"></i>
+									</a>
+								}
+								else
+								{
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "AssetIdAsc", field = ViewBag.Field, page = ViewBag.page })">
+										资产编号 <i class="fa fa-sort-desc"></i>
+									</a>
+								}
+							}
+							else
+							{
+								@if (ViewBag.SortOrder == "AssetIdAsc")
+								{
+									<a href="@Url.Action("QueryAsset", new {  sortOrder = "AssetIdDesc", page = ViewBag.page })">
+										资产编号 <i class="fa fa-sort-asc"></i>
+									</a>
+								}
+								else
+								{
+									<a href="@Url.Action("QueryAsset", new {  sortOrder = "AssetIdAsc",  page = ViewBag.page })">
+										资产编号 <i class="fa fa-sort-desc"></i>
+									</a>
+								}
+							}
+						</th>
+						<th>资产名称</th>
+						<th>资产规格</th>
+						<th>
+							@if (ViewBag.keyword != null)
+							{
+								@if (ViewBag.SortOrder == "PriceAsc")
+								{
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "PriceDesc", field = ViewBag.Field, page = ViewBag.page })">
+										价格 <i class="fa fa-sort-asc"></i>
+									</a>
+								}
+								else
+								{
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword,sortOrder = "PriceAsc",  field = ViewBag.Field, page = ViewBag.page })">
+										价格 <i class="fa fa-sort-desc"></i>
+									</a>
+								}
+							}
+							else
+							{
+								@if (ViewBag.SortOrder == "PriceAsc")
+								{
+									<a href="@Url.Action("QueryAsset", new { sortOrder = "PriceDesc", page = ViewBag.page })">
+										价格 <i class="fa fa-sort-asc"></i>
+									</a>
+								}
+								else
+								{
+									<a href="@Url.Action("QueryAsset", new { sortOrder = "PriceAsc",  page = ViewBag.page })">
+										价格 <i class="fa fa-sort-desc"></i>
+									</a>
+								}
+							}
+						</th>
+						<th>
+							@if (ViewBag.keyword != null)
+							{
+								@if (ViewBag.SortOrder == "PurchaseDateAsc")
+								{
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "PurchaseDateDesc", field = ViewBag.Field, page = ViewBag.page })">
+										购入日期 <i class="fa fa-sort-asc"></i>
+									</a>
+								}
+								else
+								{
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "PurchaseDateAsc", field = ViewBag.Field, page = ViewBag.page })">
+										购入日期 <i class="fa fa-sort-desc"></i>
+									</a>
+								}
+							}
+							else
+							{
+								@if (ViewBag.SortOrder == "PurchaseDateAsc")
+								{
+									<a href="@Url.Action("QueryAsset", new { sortOrder = "PurchaseDateDesc",  page = ViewBag.page })">
+										购入日期 <i class="fa fa-sort-asc"></i>
+									</a>
+								}
+								else
+								{
+									<a href="@Url.Action("QueryAsset", new { sortOrder = "PurchaseDateAsc",  page = ViewBag.page })">
+										购入日期 <i class="fa fa-sort-desc"></i>
+									</a>
+								}
+							}
+						</th>
+						<th>存放位置</th>
+						<th>资产类别</th>
+						<th>资产图片</th>
+						<th>资产保管人</th>
+						<th>所属部门</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -95,6 +206,44 @@
 					}
 				</tbody>
 			</table>
+			<div class="d-flex justify-content-center align-items-center my-4">
+				<nav aria-label="Page navigation example">
+					<ul class="pagination  justify-content-center">
+						@if (ViewBag.page == 1 || ViewBag.page == null)
+						{
+							<li class="page-item disabled"><a class="page-link" href="#">上一页</a></li>
+						}
+						else
+						{
+							<li class="page-item"><a class="page-link" href="?keyword=@ViewBag.keyword&amp;field=@ViewBag.field&amp;sortOrder=@ViewBag.SortOrder&amp;page=@(ViewBag.page - 1)">上一页</a></li>
+						}
+
+						@for (var i = 1; i <= ViewBag.totalPages; i++)
+						{
+							if (i == ViewBag.page || (ViewBag.page == null && i == 1))
+							{
+								<li class="page-item active"><a class="page-link" href="#">@i</a></li>
+							}
+							else
+							{
+								<li class="page-item"><a class="page-link" href="?keyword=@ViewBag.keyword&amp;field=@ViewBag.field&amp;sortOrder=@ViewBag.SortOrder&amp;page=@i">@i</a></li>
+							}
+						}
+
+						@if (ViewBag.page == ViewBag.totalPages || ViewBag.page == null)
+						{
+							<li class="page-item disabled"><a class="page-link" href="#">下一页</a></li>
+						}
+						else
+						{
+							<li class="page-item"><a class="page-link" href="?keyword=@ViewBag.keyword&amp;field=@ViewBag.field&amp;sortOrder=@ViewBag.SortOrder&amp;page=@(ViewBag.page + 1)">下一页</a></li>
+						}
+					</ul>
+				</nav>
+			</div>
+			<div class="text-end">
+				<span>共 @ViewBag.totalPages 页，@ViewBag.totalItemCount 条记录</span>
+			</div>
 		}
 	}
 	else
@@ -112,7 +261,7 @@
 <script>
 	var typed = new Typed("#printing", {
 		//在了后面停顿三秒
-		strings: ["嘀嘀嘀，主机通讯中......^1000", "目前暂无此数据，可重新搜索试试🔍......"],
+		strings: ["嘀嘀嘀，主机通讯中......^1000", "没有找到相关的内容，可试试搜索其他关键词🔍......"],
 		typeSpeed: 200,//打字的速度
 	});
 

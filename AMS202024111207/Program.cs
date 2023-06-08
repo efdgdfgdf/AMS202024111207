@@ -14,9 +14,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
  {
      //只能透过http(s)来访问 
      options.Cookie.HttpOnly = true;
-     //未登录时重定向至index 
+     //未登录时重定向至Login 
      options.LoginPath = new PathString("/Home/Login");
-     //拒绝访问时重定向至index 
+     //拒绝访问时重定向至Login
      options.AccessDeniedPath = new PathString("/Home/Login");
  });
 var app = builder.Build();
@@ -27,7 +27,7 @@ app.UseCookiePolicy();
 app.UseAuthentication();
 //启用授权功能 
 app.UseAuthorization();
-//默认登录页
+//默认登录页Login
 app.MapControllerRoute(name: "default",
  pattern: "{Controller=Home}/{Action=Login}/{Id?}");
 app.Run();

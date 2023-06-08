@@ -43,7 +43,7 @@ namespace AMS202024111207.Controllers
             }
             return View(department);
         }
-
+        //部门详情
         public IActionResult DepartmentDetails(int id)
         {
             var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == id);
@@ -91,21 +91,26 @@ namespace AMS202024111207.Controllers
         //DepartmentAdmin Action: 部门管理页面
         public IActionResult DepartmentAdmin(string keyword)
         {
+            bool hasResult;
             if (keyword != null)
             {
                 //使用LINQ扩充方法，可多个字段查询
                 departments = _context.Departments.OrderBy(d => d.DepartmentId)
-                    .Where(d => d.DepartmentId.ToString().Contains(keyword) || d.DepartmentName.Contains(keyword) || d.Supervisor.UserName.Contains(keyword))
+                    .Where(d => d.DepartmentId.ToString().Equals(keyword) || d.DepartmentName.Contains(keyword) || d.Supervisor.UserName.Contains(keyword))
                     .Include(d => d.Supervisor).AsNoTracking()
                     .ToList();
                 ViewBag.keyword = keyword;
-                ViewBag.departments = departments;
+                // 是否有部门数据
+                hasResult = (departments != null && departments.Count > 0);
+                ViewBag.result = hasResult;
                 return View(departments);
             }
             departments = _context.Departments.OrderBy(d => d.DepartmentId)
             .Include(d => d.Supervisor).AsNoTracking()
             .ToList();
-            ViewBag.departments = departments;
+            // 是否有部门数据
+            hasResult = (departments != null && departments.Count > 0);
+            ViewBag.result = hasResult;
             return View(departments);
         }
 
@@ -120,8 +125,8 @@ namespace AMS202024111207.Controllers
                 TempData["Result"] = "部门信息删除成功!";
             }
             catch (Exception)
-            {
-                TempData["Result"] = "部门信息删除失败！请先删除部门主管--" + departments.Supervisor.UserName+ "的员工信息";
+            { 
+                TempData["Result"] = "部门信息删除失败！请先删除该部门主管的员工信息或资产信息";
             }
             return RedirectToAction("DepartmentAdmin"); //重定向到部门管理页
         }

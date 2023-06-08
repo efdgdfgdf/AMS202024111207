@@ -19,10 +19,7 @@
 	@{
 		@if (TempData["Result"] != null)
 		{
-			<script>
-				// 显示弹窗
-				swal("Good job!", @TempData["Result"], "success");
-			</script>
+			<span style="color:red; font-size: 16px; ">操作结果==> @TempData["Result"]</span>
 		}
 	}
 	<hr />

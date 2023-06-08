@@ -79,27 +79,71 @@ form {
     position: relative;
 }
 
-    .input-field i {
-        text-align: center;
-        line-height: 55px;
-        /*color: #acacac;*/
-        transition: 0.5s;
-        font-size: 1.1rem;
-    }
+.input-field select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    font-size: 16px;
+    /*margin-bottom: 10px;*/
+    position: relative;
+}
+/* Focus */
+.input-field select:focus {
+    outline: none;
+}
 
-    .input-field input {
-        background: none;
-        outline: none;
-        border: none;
-        line-height: 1;
-        font-weight: 600;
-        font-size: 1.1rem;
-    }
+/* Dropdown Arrow */
+.input-field select::-ms-expand {
+    display: none; /* remove default arrow in IE */
+}
 
-    .input-field input::placeholder {
-        color: #aaa;
-        font-weight: 500;
-    }
+.input-field select::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    transform: translateY(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    border-bottom: 2px solid #aaa;
+    border-right: 2px solid #aaa;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Dropdown List */
+.input-field select option {
+    background-color: #f0f0f0;
+    color: black;
+}
+
+
+
+.input-field i {
+    text-align: center;
+    line-height: 55px;
+    /*color: #acacac;*/
+    transition: 0.5s;
+    font-size: 1.1rem;
+}
+
+.input-field input {
+    background: none;
+    outline: none;
+    border: none;
+    line-height: 1;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.input-field input::placeholder {
+    color: #aaa;
+    font-weight: 500;
+}
 
 .social-text {
     padding: 0.7rem 0;

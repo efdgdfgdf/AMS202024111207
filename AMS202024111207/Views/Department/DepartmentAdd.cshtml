@@ -8,7 +8,7 @@
 
 @{ 
     ViewData["Title"] = "添加部门"; 
-    var employees = _context.Employees.ToList();
+    var employees = _context.Employees.Where(e=>e.Role.Trim() == "Admin").ToList(); //只有管理员角色能当部门主管
 } 
 
 <div class="container mt-5 mb-5">

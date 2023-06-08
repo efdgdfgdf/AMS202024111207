@@ -30,7 +30,7 @@
 			<a href="/Department/DepartmentAdd" role="button" class="btn btn-primary btn-xl">添加部门</a>
 		</form>
 	</div>
-	@if (ViewBag.departments != null && ViewBag.departments.Count > 0)
+	@if (ViewBag.result)
 	{
 		if (ViewBag.keyword != null)
 		{
@@ -46,10 +46,10 @@
 			<table class="table table-hover" style="table-layout:fixed;">
 				<thead class="table-light">
 					<tr>
-						<td>部门编号</td>
-						<td>部门名称</td>
-						<td>部门主管</td>
-						<td>操作</td>
+						<th>部门编号</th>
+						<th>部门名称</th>
+						<th>部门主管</th>
+						<th>操作</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -93,7 +93,7 @@
 <script>
 	var typed = new Typed("#printing", {
 		//在了后面停顿三秒
-		strings: ["嘀嘀嘀，主机通讯中......^1000", "目前暂无此数据，可重新搜索试试🔍......"],
+		strings: ["嘀嘀嘀，主机通讯中......^1000", "没有找到相关的内容，可试试搜索其他关键词🔍......"],
 		typeSpeed: 200,//打字的速度
 	});
 </script>

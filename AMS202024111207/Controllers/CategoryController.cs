@@ -44,7 +44,7 @@ namespace AMS202024111207.Controllers
             }
             return View(category);
         }
-
+        //资产类别详情
         public IActionResult CategoryDetails(int id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
@@ -91,18 +91,24 @@ namespace AMS202024111207.Controllers
         //CategoryAdmin Action: 固定资产类别管理页面
         public IActionResult CategoryAdmin(string keyword)
         {
+            bool hasResult;
             if (keyword != null)
             {
                 //使用LINQ扩充方法，可多个字段查询
                 categories = _context.Categories.OrderBy(c => c.CategoryId)
-                    .Where(c => c.CategoryId.ToString().Contains(keyword) || c.CategoryName.Contains(keyword) || c.Description.Contains(keyword))
+                    .Where(c => c.CategoryId.ToString().Equals(keyword) || c.CategoryName.Contains(keyword) || c.Description.Contains(keyword))
                     .ToList();
                 ViewBag.keyword = keyword;
-                ViewBag.categories = categories;
+                // 是否有资产类别数据
+                hasResult = (categories != null && categories.Count > 0);
+                ViewBag.result = hasResult;
                 return View(categories);
             }
             categories = _context.Categories.OrderBy(c => c.CategoryId).ToList();
-            ViewBag.categories = categories;
+
+            // 是否有资产类别数据
+            hasResult = (categories != null && categories.Count > 0);
+            ViewBag.result = hasResult;
             return View(categories);
         }
 
@@ -118,9 +124,9 @@ namespace AMS202024111207.Controllers
             }
             catch(Exception)
             {
-                TempData["Result"] = "固定资产类别信息删除错误！请先清除属于资产类别--" + category.CategoryName + "的所有资产";
+                TempData["Result"] = "固定资产类别信息删除错误！请先清除属于" + category.CategoryName + "的所有资产";
             }
-            return RedirectToAction("CategoryAdmin"); //重定向到资产管理页
+            return RedirectToAction("CategoryAdmin"); //重定向到资产类别管理页
         }
     }
 }

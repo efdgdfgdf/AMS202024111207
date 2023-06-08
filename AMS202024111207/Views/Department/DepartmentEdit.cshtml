@@ -8,7 +8,7 @@
 
 @{
 	ViewData["Title"] = "修改部门信息";
-	var employees = _context.Employees.ToList();
+	var employees = _context.Employees.Where(e=>e.Role.Trim() == "Admin").ToList();
 }
 
 <div class="container mt-5 mb-5">
