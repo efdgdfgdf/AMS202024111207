@@ -64,30 +64,30 @@
 						<th>
 							@if (ViewBag.keyword != null )
 							{
-								@if (ViewBag.SortOrder == "AssetIdAsc")
+								@if (ViewBag.SortOrder == "AssetIdDesc")
 								{
-									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "AssetIdDesc", field = ViewBag.Field, page = ViewBag.page })">
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "AssetIdAsc", field = ViewBag.Field, page = ViewBag.page })">
 										资产编号 <i class="fa fa-sort-asc"></i>
 									</a>
 								}
 								else
 								{
-									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "AssetIdAsc", field = ViewBag.Field, page = ViewBag.page })">
+									<a href="@Url.Action("QueryAsset", new { keyword = ViewBag.keyword, sortOrder = "AssetIdDesc", field = ViewBag.Field, page = ViewBag.page })">
 										资产编号 <i class="fa fa-sort-desc"></i>
 									</a>
 								}
 							}
 							else
 							{
-								@if (ViewBag.SortOrder == "AssetIdAsc")
+								@if (ViewBag.SortOrder == "AssetIdDesc")
 								{
-									<a href="@Url.Action("QueryAsset", new {  sortOrder = "AssetIdDesc", page = ViewBag.page })">
+									<a href="@Url.Action("QueryAsset", new {  sortOrder = "AssetIdAsc", page = ViewBag.page })">
 										资产编号 <i class="fa fa-sort-asc"></i>
 									</a>
 								}
 								else
 								{
-									<a href="@Url.Action("QueryAsset", new {  sortOrder = "AssetIdAsc",  page = ViewBag.page })">
+									<a href="@Url.Action("QueryAsset", new {  sortOrder = "AssetIdDesc",  page = ViewBag.page })">
 										资产编号 <i class="fa fa-sort-desc"></i>
 									</a>
 								}

@@ -41,7 +41,7 @@
 			<br />
 			<div class="form-group row">
 				<label for="field" class="col-sm-2 col-form-label">查询字段</label>
-				<div class="col-sm-4">
+				<div class="col-sm-3">
 					<select name="field" id="field" class="form-select">
 						@foreach (var option in ViewData["options"] as SelectList)
 						{
@@ -49,7 +49,7 @@
 						}
 					</select>
 				</div>
-				<div class="col-sm-4">
+				<div class="col-sm-5">
 					<button type="submit" class="btn btn-danger">查询员工</button>
 					<a href="/Employee/EmployeeAdmin" role="button" class="btn btn-warning">全部</a>
 					<a href="/Employee/EmployeeAdd" role="button" class="btn btn-primary">添加员工</a>
@@ -115,8 +115,29 @@
 							<td>
 								<a href="/Employee/EmployeeEdit?id=@item.EmployeeId" class="btn btn-sm btn-outline-primary">修改</a>
 								<a href="/Employee/EmployeeDetails?id=@item.EmployeeId" class="btn btn-sm btn-outline-success">详情</a>
-								<a href="/Employee/EmployeeDelete?id=@item.EmployeeId" class="btn btn-sm btn-outline-danger"
-									onclick="return confirm('确定要删出员工 @item.UserName.Trim() - @item.Role.Trim()角色吗？');">删除</a>
+								@*<a href="/Employee/EmployeeDelete?id=@item.EmployeeId" class="btn btn-sm btn-outline-danger"
+									onclick="return confirm('确定要删出员工 @item.UserName.Trim() - @item.Role.Trim()角色吗？');">删除</a>*@
+								<button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+									删除
+								</button>
+								<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h5 class="modal-title" id="deleteModalLabel">员工删除确认</h5>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div class="modal-body">
+												确认要删除员工 @item.UserName.Trim() - @item.Role.Trim()角色 吗？
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+												<a href="/Employee/EmployeeDelete?id=@item.EmployeeId" class="btn btn-danger">确认删除</a>
+											</div>
+										</div>
+									</div>
+								</div>
+
 							</td>
 						</tr>
 					}

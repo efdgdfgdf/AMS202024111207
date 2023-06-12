@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using DocumentFormat.OpenXml;
+using NPOI;
+using NPOI.XSSF.UserModel;
 
 namespace AMS202024111207.Controllers
 {
@@ -156,7 +159,7 @@ namespace AMS202024111207.Controllers
         }
 
         //AssetAdmin Action: 固定资产管理页面
-        public IActionResult AssetAdmin(string keyword, string field, string sortOrder, int? page)
+        public IActionResult AssetAdmin(string keyword, string field, string sortOrder, int? page, int pageSize = 10)
         {
             IQueryable<Asset> query = _context.Assets
                 .Include(a => a.Category).AsNoTracking()
@@ -247,7 +250,6 @@ namespace AMS202024111207.Controllers
                 }
             }
             // 分页
-            int pageSize = 10; // 每页显示的数量
             int pageNumber = (page ?? 1); // 当前页数
             int totalItemCount = query.Count();
             // 计算总页数
@@ -289,6 +291,7 @@ namespace AMS202024111207.Controllers
             ViewBag.keyword = keyword;
             ViewBag.field = field;
             ViewBag.page = page;
+            ViewBag.pageSize = pageSize;
             ViewBag.totalPages = totalPages;
             ViewBag.totalItemCount = totalItemCount;
 
@@ -312,6 +315,188 @@ namespace AMS202024111207.Controllers
                 TempData["Result"] = "固定资产信息删除失败!";
             }
             return RedirectToAction("AssetAdmin"); //重定向到资产管理页
+        }
+
+        // 批量删除资产
+        [HttpPost]
+        public async Task<ActionResult> DeleteSelected(List<int> assetIds)
+        {
+            if (assetIds == null || assetIds.Count == 0)
+            {
+                // 如果未选定要删除的资产，则重定向回资产管理页面
+                return RedirectToAction("AssetAdmin");
+            }
+            else
+            {
+                try
+                {
+                    foreach (var id in assetIds)
+                    {
+                        var asset = await _context.Assets.FirstOrDefaultAsync(a => a.AssetId == id);
+                        if (asset != null)
+                        {
+                            // 删除数据库中的资产信息
+                            _context.Assets.Remove(asset);
+                            // 删除对应的相片文件
+                            System.IO.File.Delete($"{_path}\\{asset.ImgName}");
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                    TempData["Result"] = "所选固定资产信息删除成功!";
+                }
+                catch (Exception)
+                {
+                    TempData["Result"] = "所选固定资产信息删除失败!";
+                }
+                // 删除完成后重定向回资产管理页面
+                return Json(new { success = true, message = TempData["Result"] });
+            }
+        }
+
+        // 导出Excel
+        public ActionResult ExportToExcel(string keyword, string field, string sortOrder, int? page, int pageSize = 10)
+        {
+            var data = GetAssetData(keyword, field, sortOrder, page, pageSize); // 获取数据
+            var workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet("资产列表");
+
+            // 创建表头行
+            var headerRow = sheet.CreateRow(0);
+            headerRow.CreateCell(0).SetCellValue("资产编号");
+            headerRow.CreateCell(1).SetCellValue("资产名称");
+            headerRow.CreateCell(2).SetCellValue("资产规格");
+            headerRow.CreateCell(3).SetCellValue("价格");
+            headerRow.CreateCell(4).SetCellValue("购入日期");
+            headerRow.CreateCell(5).SetCellValue("存放位置");
+            headerRow.CreateCell(6).SetCellValue("资产类别");
+            headerRow.CreateCell(7).SetCellValue("资产保管人");
+            headerRow.CreateCell(8).SetCellValue("所属部门");
+
+            // 填充数据
+            for (int i = 0; i < data.Count(); i++)
+            {
+                var row = sheet.CreateRow(i + 1);
+                row.CreateCell(0).SetCellValue(data[i].AssetId);
+                row.CreateCell(1).SetCellValue(data[i].AssetName);
+                row.CreateCell(2).SetCellValue(data[i].Specification);
+                row.CreateCell(3).SetCellValue(data[i].Price.ToString());
+                row.CreateCell(4).SetCellValue(((DateTime)data[i].PurchaseDate).ToString("yyyy-MM-dd"));
+                row.CreateCell(5).SetCellValue(data[i].Location);
+                row.CreateCell(6).SetCellValue(data[i].Category.CategoryName);
+                row.CreateCell(7).SetCellValue(data[i].Custodian.UserName);
+                row.CreateCell(8).SetCellValue(data[i].Custodian.Department.DepartmentName);
+            }
+
+            // 将Excel文件输出到客户端
+            var stream = new MemoryStream();
+            workbook.Write(stream);
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "资产列表.xlsx");
+        }
+        private IList<Asset> GetAssetData(string keyword, string field, string sortOrder, int? page, int pageSize = 10)
+        {
+            var data = _context.Assets.Include(a => a.Custodian).Include(a => a.Category).Include(a => a.Custodian.Department).AsQueryable();
+
+            // 针对资产编号、价格、购入日期进行排序
+            if (!string.IsNullOrEmpty(sortOrder))
+            {
+                switch (sortOrder)
+                {
+                    case "AssetIdDesc":
+                        data = data.OrderByDescending(a => a.AssetId);
+                        ViewBag.SortOrder = "AssetIdDesc";
+                        break;
+                    case "AssetIdAsc":
+                        data = data.OrderBy(a => a.AssetId);
+                        ViewBag.SortOrder = "AssetIdAsc";
+                        break;
+                    case "PriceDesc":
+                        data = data.OrderByDescending(a => a.Price);
+                        ViewBag.SortOrder = "PriceDesc";
+                        break;
+                    case "PriceAsc":
+                        data = data.OrderBy(a => a.Price);
+                        ViewBag.SortOrder = "PriceAsc";
+                        break;
+                    case "PurchaseDateDesc":
+                        data = data.OrderByDescending(a => a.PurchaseDate);
+                        ViewBag.SortOrder = "PurchaseDateDesc";
+                        break;
+                    case "PurchaseDateAsc":
+                        data = data.OrderBy(a => a.PurchaseDate);
+                        ViewBag.SortOrder = "PurchaseDateAsc";
+                        break;
+                    default:
+                        data = data.OrderBy(a => a.AssetId);
+                        ViewBag.SortOrder = "AssetIdAsc";
+                        break;
+                }
+            }
+
+            // 针对单个字段进行关键词搜素
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                switch (field)
+                {
+                    case "AssetId":
+                        data = data.Where(a => a.AssetId.ToString().Equals(keyword));
+                        break;
+                    case "AssetName":
+                        data = data.Where(a => a.AssetName.Contains(keyword));
+                        break;
+                    case "Specification":
+                        data = data.Where(a => a.Specification.Contains(keyword));
+                        break;
+                    case "Price":
+                        data = data.Where(a => a.Price.ToString().Contains(keyword));
+                        break;
+                    case "PurchaseDate":
+                        data = data.Where(a => a.PurchaseDate.ToString().Contains(keyword));
+                        break;
+                    case "Location":
+                        data = data.Where(a => a.Location.Contains(keyword));
+                        break;
+                    case "Category":
+                        data = data.Where(a => a.Category.CategoryName.Contains(keyword));
+                        break;
+                    case "Custodian":
+                        data = data.Where(a => a.Custodian.UserName.Contains(keyword));
+                        break;
+                    case "Department":
+                        data = data.Where(a => a.Custodian.Department.DepartmentName.Contains(keyword));
+                        break;
+                    default:
+                        data = data.Where(a =>
+                            a.AssetId.ToString().Equals(keyword) ||
+                            a.AssetName.Contains(keyword) ||
+                            a.Specification.Contains(keyword) ||
+                            a.Price.ToString().Contains(keyword) ||
+                            a.PurchaseDate.ToString().Contains(keyword) ||
+                            a.Location.Contains(keyword) ||
+                            a.Category.CategoryName.Contains(keyword) ||
+                            a.Custodian.UserName.Contains(keyword) ||
+                            a.Custodian.Department.DepartmentName.Contains(keyword)
+                        );
+                        break;
+                }
+            }
+            // 分页
+            int pageNumber = (page ?? 1); // 当前页数
+            int totalItemCount = data.Count();
+            // 计算总页数
+            int totalPages = (int)Math.Ceiling((double)totalItemCount / pageSize);
+
+            // 如果请求的页码超出范围，则显示第一页或最后一页
+            pageNumber = Math.Max(1, Math.Min(pageNumber, totalPages));
+
+            // 获取当前页的资产信息
+            data = data.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+
+             ViewBag.keyword = keyword;
+            ViewBag.field = field;
+            ViewBag.page = page;
+            ViewBag.pageSize = pageSize;
+
+            return data.ToList();
         }
     }
 }
